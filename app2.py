@@ -1,7 +1,7 @@
 
 
 import numpy as np
-
+from sklearn.metrics.pairwise import cosine_similarity
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 from sklearn.preprocessing import LabelEncoder
@@ -15,14 +15,23 @@ from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 
 
+def calculate_confidence_scores(recognized_embedding, known_embeddings):
+    # Calculate cosine similarity between the recognized face and known identities
+    similarities = cosine_similarity([recognized_embedding], known_embeddings)
+    confidence_score = np.mean(similarities)
+    return confidence_score
 
 facenet = FaceNet()
 
 faces_embeddings = np.load("face_embeddings_done.npz")
-Y= faces_embeddings['arr_1']
+
+Y= faces_embeddings['arr_1'] # label
+X= faces_embeddings['arr_0']  #embeddings
+
+known_embeddings = faces_embeddings['arr_0']
+known_labels = faces_embeddings['arr_1']
 encoder = LabelEncoder()
 encoder.fit(Y)
-
 harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
 
 # model = pickle.loads(open("model.pkl","rb"))
@@ -31,7 +40,7 @@ harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
 def input_image(imgPath):
     inputImg = cv.imread(imgPath)
     inputImg = cv.cvtColor(inputImg,cv.COLOR_BGR2RGB)
-    faces = harrcascade .detectMultiScale(inputImg,1.3,3)
+    faces = harrcascade .detectMultiScale(inputImg,1.3,2)
     for (x,y,w,h) in faces:
         inputImg = inputImg[y:y+h,x:x+w]
         img = cv.resize(inputImg,(160,160))
@@ -40,10 +49,11 @@ def input_image(imgPath):
             model = pickle.load(p)
             ypred = facenet.embeddings(img)
             face_name = model.predict(ypred)
-            name = encoder.inverse_transform(face_name)
-            print('Name : ',name)
+            label = encoder.inverse_transform(face_name)
+            score = calculate_confidence_scores(ypred[0],known_embeddings)
+            print(f"Filename: {imgPath}, Name : {label} , score {1-score}")
 
-input_image("datasets/alex_carey/d600157cb7.jpg")
+input_image("testInput/1.jpg")
 
 
 
