@@ -1,3 +1,4 @@
+import time
 import cv2
 import flask
 from flask import Response
@@ -5,7 +6,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 from backend.api.router import api
-from backend.models import Base
+from backend.models import Base, ActivityLogs
 from packages.face_recognition import FaceRecognition
 
 db = SQLAlchemy(model_class=Base)
