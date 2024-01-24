@@ -88,5 +88,19 @@ class FaceRecognition:
         csv_file_path = self.outputdir + '/result.csv'
         df.to_csv(csv_file_path, index=False)
 
-    def search_identity(self, img):
-        pass
+    def search_identity(self, input_img) -> (str, str):
+        color_img = cv.cvtColor(input_img, cv.COLOR_BGR2RGB)
+        faces = self.harrcascade.detectMultiScale(color_img, 1.3, 2)
+        print('face detected in', faces)
+        for (x, y, w, h) in faces:
+            color_img = color_img[y:y + h, x:x + w]
+            img = cv.resize(color_img, (160, 160))
+            img = np.expand_dims(img, axis=0)
+            ypred = self.facenet.embeddings(img)
+            face_name = self.model.predict(ypred)
+            label = self.encoder.inverse_transform(face_name)
+            score = calculate_confidence_scores(ypred, self.X)
+
+            return label.item(), "{:.5f}".format(score.item())
+
+        return '', ""
