@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub-like Calendar</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 20px;
+    }
+
+    .calendar-wrapper {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .calendar-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .month {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .month-label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .days-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .day {
+      position: relative;
+      width: 25px;
+      height: 25px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .weekend {
+      background-color: #f0f0f0;
+    }
+
+    .emoji {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      font-size: 14px;
+    }
+
+    .emoji-tick {
+      background-color: #d6e685;
+    }
+
+    .emoji-wrong {
+      background-color: red;
+    }
+
+    .emoji-none {
+      display: none;
+    }
+
+    select {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .member-info {
+        text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="member-info">
+    <h3>John Doe</h3>
+  <h4>Sports: Cricket</h4>
+</div>
+
+<select id="yearSelect"></select>
+
+<div class="calendar-wrapper">
+  <div class="calendar-container" id="calendarContainer"></div>
+</div>
+
+<script>
+  function generateCalendar(year) {
+    const calendarContainer = document.getElementById('calendarContainer');
+    calendarContainer.innerHTML = '';
+
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+
+    for (let month = 0; month < 12; month++) {
+      const monthContainer = document.createElement('div');
+      monthContainer.classList.add('month');
+
+      const monthLabel = document.createElement('div');
+      monthLabel.classList.add('month-label');
+      monthLabel.textContent = new Date(year, month, 1).toLocaleString('en-us', { month: 'long' });
+      monthContainer.appendChild(monthLabel);
+
+      const daysContainer = document.createElement('div');
+      daysContainer.classList.add('days-container');
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayOfWeek = new Date(year, month, 1).getDay();
+
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        daysContainer.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+
+        if ([0, 6].includes(new Date(year, month, day).getDay())) {
+          dayElement.classList.add('weekend');
+        } else {
+          const emoji = document.createElement('div');
+          emoji.classList.add('emoji');
+
+          if (new Date(year, month, day) <= currentDate) {
+            emoji.textContent = day % 2 === 0 ? '✔️' : '✖️';
+            emoji.classList.add(day % 2 === 0 ? 'emoji-tick' : 'emoji-wrong');
+          } else {
+            // emoji.classList.add('emoji-none');
+          }
+          dayElement.appendChild(emoji);
+        }
+
+        // dayElement.textContent = day;
+        daysContainer.appendChild(dayElement);
+      }
+
+      monthContainer.appendChild(daysContainer);
+      calendarContainer.appendChild(monthContainer);
+    }
+  }
+
+  // Populate the dropdown with the last 5 years
+  const yearSelect = document.getElementById('yearSelect');
+  const currentYear = new Date().getFullYear();
+
+  for (let year = currentYear; year > currentYear - 5; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  }
+
+  // Generate calendar for the initially selected year
+  const initialYear = yearSelect.value;
+  generateCalendar(initialYear);
+
+  // Update calendar when the year changes
+  yearSelect.addEventListener('change', function() {
+    const selectedYear = yearSelect.value;
+    generateCalendar(selectedYear);
+  });
+</script>
+
+</body>
+</html>

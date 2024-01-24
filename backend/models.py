@@ -15,10 +15,11 @@ class Members(Base):
     updated_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     deleted_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=True)
     member_id = Column(String(200), unique=True)
-    member_type = Column(String(200))
+    member_type = Column(String(200)) # athlete, faculty, coach
     full_name = Column(String(200))
     abbr_name = Column(String(200))
     mentor_id = Column(String(200))
+    sports = Column(String(200))
     gender = Column(String(1))  # Assuming gender is a single character
 
     # def __init__(self, member_id, member_type, full_name, abbr_name, mentor_id, gender):

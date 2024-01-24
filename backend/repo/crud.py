@@ -1,5 +1,5 @@
-from backend.database import db
 from backend.models import ActivityLogs
+from server import db
 
 
 def create_activity(member_id, entry_type):

@@ -63,7 +63,8 @@ class FaceRecognition:
     def draw_image(self, frame):
         inputImg = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
         faces = self.harrcascade.detectMultiScale(inputImg, 1.3, 2)
-        print('face detected in', faces)
+
+        face_frames = []
         try:
             for (x, y, w, h) in faces:
                 inputImg = inputImg[y:y + h, x:x + w]
@@ -78,9 +79,11 @@ class FaceRecognition:
                     frame = cv2.rectangle(frame, (x - 20, y - 20), (x + w + 20, y + h + 20), (0, 255, 0), 4)
                     frame = cv2.putText(frame, "{} ({})".format(label, score), (x, y - 40), cv2.FONT_HERSHEY_SIMPLEX, 1,
                                         (255, 255, 255), 3)
+
+                    face_frames.append((inputImg, label, score))
         except Exception as e:
             print(e)
-        return frame
+        return frame, face_frames
 
     def run(self):
         data = {
@@ -101,10 +104,10 @@ class FaceRecognition:
         csv_file_path = self.outputdir + '/result.csv'
         df.to_csv(csv_file_path, index=False)
 
-    def search_identity(self, input_img) -> (str, str):
+    def search_identity(self, input_img):
         color_img = cv.cvtColor(input_img, cv.COLOR_BGR2RGB)
+        # TODO: pick the face with largest bbox
         faces = self.harrcascade.detectMultiScale(color_img, 1.3, 2)
-        print('face detected in', faces)
         for (x, y, w, h) in faces:
             color_img = color_img[y:y + h, x:x + w]
             img = cv.resize(color_img, (160, 160))
@@ -114,6 +117,6 @@ class FaceRecognition:
             label = self.encoder.inverse_transform(face_name)
             score = calculate_confidence_scores(ypred, self.X)
 
-            return label.item(), "{:.5f}".format(score.item())
+            return label.item(), '{:.5f}'.format(score.item())
 
-        return '', ""
+        return '', ''

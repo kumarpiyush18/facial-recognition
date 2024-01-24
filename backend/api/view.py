@@ -1,11 +1,13 @@
 import json
 import tempfile
+import time
 import traceback
 
 import cv2
 from flask import request, Response
 from flask_restful import Resource
 
+from backend.models import ActivityLogs
 from packages.face_recognition import FaceRecognition
 
 from http import HTTPStatus
@@ -28,25 +30,8 @@ class HealthCheck(Resource):
         return 'Hello World!!'
 
 
-cap = cv2.VideoCapture(0)
 search = FaceRecognition(directory="./sampleinput", faces_embeddings_path="./assets/face_embeddings_extract.npz",
                          model_path="./model/SVC.model_small_class.pkl", outputdir='./output')
-
-
-def gen():
-    while True:
-        _, frame = cap.read()
-        processed_frame = search.draw_image(frame)
-        ret, buffer = cv2.imencode('.jpg', processed_frame)
-        f = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + f + b'\r\n\r\n')
-
-
-class VideoFeed(Resource):
-
-    def get(self):
-        return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 class SearchIdentity(Resource):
