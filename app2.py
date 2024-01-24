@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
+import pandas as pd
 
 
 def calculate_confidence_scores(recognized_embedding, known_embeddings):
@@ -53,7 +54,7 @@ def input_image(imgPath):
             score = calculate_confidence_scores(ypred[0],known_embeddings)
             print(f"Filename: {imgPath}, Name : {label} , score {1-score}")
 
-input_image("testInput/1.jpg")
+input_image("datasets/aaron_finch/c6cfa3d550.jpg")
 
 
 
