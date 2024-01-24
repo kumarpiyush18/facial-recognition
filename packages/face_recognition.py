@@ -2,13 +2,26 @@ import os
 
 import cv2
 import numpy as np
-
+import sys
+import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import pickle
 import cv2 as cv
 from keras_facenet import FaceNet
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
+
+def get_base_path():
+    if hasattr(sys, '_MEIPASS'):
+    # Running as a PyInstaller bundled executable
+        base_path = sys._MEIPASS
+    else:
+    # Running as a script
+        base_path = os.getcwd()
+    return base_path
+    
+
+
 
 
 def calculate_confidence_scores(recognized_embedding, known_embeddings):
@@ -26,7 +39,7 @@ class FaceRecognition:
         self.faces_embeddings_path = faces_embeddings_path
         self.model_path = model_path
         self.encoder = LabelEncoder()
-        self.harrcascade = cv.CascadeClassifier("./assets/haarcascade_frontalface_default.xml")
+        self.harrcascade = cv.CascadeClassifier(os.path.join(get_base_path(),"assets","haarcascade_frontalface_default.xml"))
         self.faces_embeddings = np.load(self.faces_embeddings_path)  # "face_embeddings_done.npz"
         with open(self.model_path, 'rb') as p:
             self.model = pickle.load(p)

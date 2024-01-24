@@ -1,2 +1,7 @@
 .vscode/
 venv/
+output/
+dist/
+.spec
+app.spec
+build/

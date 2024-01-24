@@ -2,6 +2,17 @@ from packages.face_recognition import FaceRecognition
 
 import argparse
 
+import sys
+import os
+
+if hasattr(sys, '_MEIPASS'):
+    # Running as a PyInstaller bundled executable
+    base_path = sys._MEIPASS
+else:
+    # Running as a script
+    base_path = os.getcwd()
+
+# print(base_path)
 
 def main(directory, faces_embeddings_path, model_path, outputdir):
     # Your existing code goes here
@@ -19,11 +30,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Description of your script")
 
     # Define command-line arguments with default values
-    parser.add_argument("--directory", default="./sampleinput", help="Path to the directory")
-    parser.add_argument("--faces_embeddings_path", default="./assets/face_embeddings_extract.npz",
+    parser.add_argument("--directory", default=os.path.join(base_path,"sampleinput"), help="Path to the directory")
+    parser.add_argument("--faces_embeddings_path", default=os.path.join(base_path,"assets","face_embeddings_extract.npz"),
                         help="Path to face embeddings")
-    parser.add_argument("--model_path", default="./model/SVC.model_small_class.pkl", help="Path to the model")
-    parser.add_argument("--outputdir", default="./output", help="Path to the output directory")
+    parser.add_argument("--model_path", default=os.path.join(base_path,"model","SVC.model_small_class.pkl"), help="Path to the model")
+    parser.add_argument("--outputdir", default=os.path.join(base_path,"output"), help="Path to the output directory")
 
     # Parse the command-line arguments
     args = parser.parse_args()
