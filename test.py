@@ -24,18 +24,15 @@ class TestSample:
         self.encoder = LabelEncoder()
         self.harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
         self.faces_embeddings = np.load(self.faces_embeddings_path) #"face_embeddings_done.npz"
-        self.Y = self.faces_embeddings['arr_1']
-        self.X = self.faces_embeddings['arr_0']
-        with open(self.model_path, 'rb') as p:
-            self.model = pickle.load(p)
+        with open(self.model_path,'rb') as p:
+                self.model = pickle.load(p)
+        self.Y,self.X = self.faces_embeddings['arr_1'], self.faces_embeddings['arr_0']
         self.encoder.fit(self.Y)
     
 
     def calculate_confidence_scores(slef,recognized_embedding, known_embeddings):
-        # Calculate cosine similarity between the recognized face and known identities
-        # similarities = cosine_similarity([recognized_embedding], known_embeddings)
-        # cosine_similarity = 1 - cosine(np.array([recognized_embedding]), np.array(known_embeddings))
-        # known_embeddings = known_embeddings.
+
+        # calculate similarity
         cosine_similarity = 1-np.dot([recognized_embedding],known_embeddings.T)/( np.linalg.norm([recognized_embedding]) * np.linalg.norm(known_embeddings,axis=1))
         confidence_score = np.mean(cosine_similarity)
         return confidence_score
@@ -48,11 +45,9 @@ class TestSample:
             inputImg = inputImg[y:y+h,x:x+w]
             img = cv.resize(inputImg,(160,160))
             img = np.expand_dims(img, axis=0)
-            with open(self.model_path,'rb') as p:
-                model = pickle.load(p)
-                ypred = self.facenet.embeddings(img)
-                face_name = model.predict(ypred)
-                label = self.encoder.inverse_transform(face_name)
+            ypred = self.facenet.embeddings(img)
+            face_name = self.model.predict(ypred)
+            label = self.encoder.inverse_transform(face_name)
             return imgPath,label,ypred[0]
 
     def draw_image(self,frame):
@@ -78,10 +73,6 @@ class TestSample:
         return frame
 
     def test(self):
-        Y,X = self.faces_embeddings['arr_1'], self.faces_embeddings['arr_0']
-        known_embeddings = self.faces_embeddings['arr_0']
-        known_labels = self.faces_embeddings['arr_1']
-        Y = self.encoder.fit(Y)
         data= {
             "Image" : [],
             "Label": [],
@@ -91,18 +82,16 @@ class TestSample:
         for files in os.listdir(self.directory):
             path = self.directory + '/' + files
             imgPath,label,ypred=self.input_image(path)
-            score = self.calculate_confidence_scores(ypred,known_embeddings)
+            score = self.calculate_confidence_scores(ypred,self.X)
             data['Image'].append(imgPath)
             data['Label'].append(label[0])
             data['Score'].append(score)
-            print(f"Filename: {imgPath}, Name : {label} , score {((score))*100}")
+            print(f"Filename: {imgPath}, Name : {label[0]} , score {((score))*100}")
         df = pd.DataFrame(data)
-        csv_file_path = './result.csv'
+        csv_file_path = './output/result.csv'
         df.to_csv(csv_file_path,index=False)
+
 
     def search_identity(self, img):
         pass
-       
-
-# test_sample = TestSample("./output",faces_embeddings_path="./face_embeddings_done.npz",model_path="./model.pkl")
-# test_sample.test()
+    

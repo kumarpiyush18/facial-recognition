@@ -31,7 +31,10 @@ class Train:
         for img in self.X:
             self.Embedded_X.append(self.get_face_embeddings(img))
         self.Embedded_X = np.asarray(self.Embedded_X)
-        np.savez_compressed('./face_embeddings_small_class.npz',self.Embedded_X,self.Y)
+        try:
+            np.savez_compressed('./face_embeddings_extract.npz',self.Embedded_X,self.Y)
+        except Exception as e:
+            print("Some Problem occured while saving to the file : ",e)
         print("Face embeddings completed......")
 
     def train_data(self):
@@ -41,9 +44,9 @@ class Train:
         X_train,X_test,y_train,y_test = train_test_split(self.Embedded_X,self.Y, test_size=0.2, shuffle=True,random_state=0)
         model = SVC(kernel='linear',probability=True)
         model.fit(X_train,y_train)
-        pickle.dump(model, open('./model_small_class.pkl', 'wb'))
-        ypreds_test = model.predict(X_test)
         try:
+            pickle.dump(model, open('./model/SVC.model_small_class.pkl', 'wb'))
+            ypreds_test = model.predict(X_test)
             acc = accuracy_score(y_test,ypreds_test)
         except Exception as e:
             print(f"Error in calculating the accuracy score : {e}")
