@@ -10,7 +10,7 @@ from backend.models import Base
 
 from flask_sqlalchemy import SQLAlchemy
 
-from test import TestSample
+from packages.test import TestSample
 
 flask_app = flask.Flask(__name__)
 flask_app.config.update(

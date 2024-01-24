@@ -22,7 +22,7 @@ class TestSample:
         self.faces_embeddings_path = faces_embeddings_path
         self.model_path = model_path
         self.encoder = LabelEncoder()
-        self.harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
+        self.harrcascade = cv.CascadeClassifier("./assets/haarcascade_frontalface_default.xml")
         self.faces_embeddings = np.load(self.faces_embeddings_path) #"face_embeddings_done.npz"
         with open(self.model_path,'rb') as p:
                 self.model = pickle.load(p)
@@ -72,7 +72,7 @@ class TestSample:
             print(e)
         return frame
 
-    def test(self):
+    def run(self):
         data= {
             "Image" : [],
             "Label": [],
@@ -94,4 +94,4 @@ class TestSample:
 
     def search_identity(self, img):
         pass
-    
+
