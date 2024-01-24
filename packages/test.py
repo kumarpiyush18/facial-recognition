@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 
 class TestSample:
-    def __init__(self, directory,faces_embeddings_path,model_path):
+    def __init__(self, directory,faces_embeddings_path,model_path,outputdir):
         self.directory = directory
         self.facenet = FaceNet()
         self.faces_embeddings_path = faces_embeddings_path
@@ -23,6 +23,7 @@ class TestSample:
                 self.model = pickle.load(p)
         self.Y,self.X = self.faces_embeddings['arr_1'], self.faces_embeddings['arr_0']
         self.encoder.fit(self.Y)
+        self.outputdir = outputdir
     
 
     def calculate_confidence_scores(slef,recognized_embedding, known_embeddings):
@@ -83,7 +84,7 @@ class TestSample:
             data['Score'].append(score)
             print(f"Filename: {imgPath}, Name : {label[0]} , score {((score))*100}")
         df = pd.DataFrame(data)
-        csv_file_path = './output/result.csv'
+        csv_file_path = self.outputdir +'/result.csv'
         df.to_csv(csv_file_path,index=False)
 
 
