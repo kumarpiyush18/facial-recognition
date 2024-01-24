@@ -1,18 +1,13 @@
+import os
+
 import cv2
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-from sklearn.preprocessing import LabelEncoder
 import pickle
 import cv2 as cv
-from mtcnn.mtcnn import MTCNN
 from keras_facenet import FaceNet
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
-from sklearn.svm import SVC
-from scipy.spatial.distance import cosine
 import pandas as pd
 
 class TestSample:
