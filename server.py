@@ -10,7 +10,7 @@ from backend.models import Base
 
 from flask_sqlalchemy import SQLAlchemy
 
-from packages.test import TestSample
+from packages.face_recognition import FaceRecognition
 
 flask_app = flask.Flask(__name__)
 flask_app.config.update(
@@ -21,7 +21,7 @@ CORS(flask_app)
 api.init_app(flask_app)
 
 cap = cv2.VideoCapture(0)
-search = TestSample("./output", faces_embeddings_path="./face_embeddings_done.npz", model_path="./model.pkl")
+search = FaceRecognition(directory="./sampleinput", faces_embeddings_path="./assets/face_embeddings_extract.npz", model_path="./model/SVC.model_small_class.pkl")
 
 
 def gen():
@@ -38,6 +38,9 @@ def gen():
 def video_feed():
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+def search_identity():
+    return
 
 if __name__ == "__main__":
     flask_app.run(port=8001, debug=True)
