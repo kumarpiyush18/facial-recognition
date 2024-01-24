@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import os
@@ -23,6 +24,11 @@ class TestSample:
         self.encoder = LabelEncoder()
         self.harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
         self.faces_embeddings = np.load(self.faces_embeddings_path) #"face_embeddings_done.npz"
+        self.Y = self.faces_embeddings['arr_1']
+        self.X = self.faces_embeddings['arr_0']
+        with open(self.model_path, 'rb') as p:
+            self.model = pickle.load(p)
+        self.encoder.fit(self.Y)
     
 
     def calculate_confidence_scores(slef,recognized_embedding, known_embeddings):
@@ -48,7 +54,29 @@ class TestSample:
                 face_name = model.predict(ypred)
                 label = self.encoder.inverse_transform(face_name)
             return imgPath,label,ypred[0]
-    
+
+    def draw_image(self,frame):
+        inputImg = cv.cvtColor(frame,cv.COLOR_BGR2RGB)
+        faces = self.harrcascade.detectMultiScale(inputImg,1.3,2)
+        print('face detected in', faces)
+        try:
+            for (x,y,w,h) in faces:
+                inputImg = inputImg[y:y+h,x:x+w]
+                img = cv.resize(inputImg,(160,160))
+                img = np.expand_dims(img, axis=0)
+                ypred = self.facenet.embeddings(img)
+                face_name = self.model.predict(ypred)
+                label = self.encoder.inverse_transform(face_name)
+                score = self.calculate_confidence_scores(ypred, self.X)
+
+                if score > 0.92:
+                    frame = cv2.rectangle(frame, (x - 20, y - 20), (x + w + 20, y + h + 20), (0, 255, 0), 4)
+                    frame = cv2.putText(frame, "{} ({})".format(label, score), (x, y - 40), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                        (255, 255, 255), 3)
+        except Exception as e:
+            print(e)
+        return frame
+
     def test(self):
         Y,X = self.faces_embeddings['arr_1'], self.faces_embeddings['arr_0']
         known_embeddings = self.faces_embeddings['arr_0']
@@ -71,8 +99,10 @@ class TestSample:
         df = pd.DataFrame(data)
         csv_file_path = './result.csv'
         df.to_csv(csv_file_path,index=False)
-            
+
+    def search_identity(self, img):
+        pass
        
 
-test_sample = TestSample("./output",faces_embeddings_path="./face_embeddings_done.npz",model_path="./model.pkl")
-test_sample.test()
+# test_sample = TestSample("./output",faces_embeddings_path="./face_embeddings_done.npz",model_path="./model.pkl")
+# test_sample.test()

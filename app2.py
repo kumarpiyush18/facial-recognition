@@ -13,7 +13,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
-import pandas as pd
 
 
 def calculate_confidence_scores(recognized_embedding, known_embeddings):
@@ -41,7 +40,7 @@ harrcascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
 def input_image(imgPath):
     inputImg = cv.imread(imgPath)
     inputImg = cv.cvtColor(inputImg,cv.COLOR_BGR2RGB)
-    faces = harrcascade .detectMultiScale(inputImg,1.3,2)
+    faces = harrcascade.detectMultiScale(inputImg,1.3,2)
     for (x,y,w,h) in faces:
         inputImg = inputImg[y:y+h,x:x+w]
         img = cv.resize(inputImg,(160,160))
